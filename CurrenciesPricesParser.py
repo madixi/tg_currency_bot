@@ -16,7 +16,7 @@ class CurrenciesPricesParser:
         executable_path="./driver/geckodriver.exe",
         options=__driver_options)
 
-    def __get_page(self, currency: str, city_url_name: str):
+    def _get_page(self, currency: str, city_url_name: str):
         url = self.__DEFAULT_URL \
             .replace("<currency>", currency) \
             .replace("<city>", city_url_name)
@@ -68,14 +68,3 @@ class CurrenciesPricesParser:
         currency_data = soup.find("charcode", text=currency.upper()).parent
         price = float(currency_data.find("value").get_text().replace(",", "."))
         return price
-
-    def run_tests(self):
-        self.__get_cb_price_test()
-        print("get_cb_price passed all tests")
-
-    def __get_cb_price_test(self):
-        assert self.get_cb_price("usd", "20.03.2001".split(".")) == 28.65
-        assert self.get_cb_price("eur", "05.02.2000".split(".")) == 28.49
-        assert self.get_cb_price("gbp", "23.06.2010".split(".")) == 45.6427
-        assert self.get_cb_price("cny", "14.05.2019".split(".")) == 95.2642
-        assert self.get_cb_price("jpy", "03.07.2020".split(".")) == 65.664
