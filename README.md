@@ -10,3 +10,6 @@
 Использование:
 python CurrenciesPricesBot.py
 
+Тестирование:
+метод run_tests() у классов MessageParser и CurrenciesPricesParser
+
