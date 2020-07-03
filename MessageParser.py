@@ -38,6 +38,9 @@ class MessageParser:
         else:
             return ()
 
+    def run_tests(self):
+        self.__message_parse_tests()
+
     def __find_city(self, message: str):
         for i, city in enumerate(self.__CITIES_DATA['city_oblig_part']):
             if message.find(city) != -1:
@@ -57,3 +60,40 @@ class MessageParser:
         self.__city_url_name = None
         self.__city_name = None
         self.__currency_code = None
+
+    def __message_parse_tests(self):
+        self.__find_city(
+            "Как же я люблю сидеть в Санкт-Петербурге и думать про доллары"
+                .lower())
+        assert self.__city_url_name == "sankt-peterburg"
+        assert self.__city_name == "Санкт-Петербург"
+        self.__reset_values()
+
+        self.__find_city(
+            "А вот приеду в Краснодаре и буду покупать евро".lower())
+        assert self.__city_url_name == "krasnodar"
+        assert self.__city_name == "Краснодар"
+        self.__reset_values()
+
+        self.__find_city(
+            "ывлпофж фл ывд фыда лфыждв л".lower())
+        assert self.__city_url_name is None
+        assert self.__city_name is None
+        self.__reset_values()
+
+        self.__find_currency(
+            "А вот во Владивостоке куплю себе CNY".lower())
+        assert self.__currency_code == "cny"
+        self.__reset_values()
+
+        self.__find_currency(
+            "Приеду к брату в Томск - куплю себе йен".lower())
+        assert self.__currency_code == "jpy"
+        self.__reset_values()
+
+        self.__find_currency(
+            "ывлпофж фл ывд фыда лфыждв л")
+        assert self.__currency_code is None
+        self.__reset_values()
+
+        print("MessageParser passed all tests")
