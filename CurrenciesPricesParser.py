@@ -27,7 +27,7 @@ class CurrenciesPricesParser:
 
     def get_local_prices(self, currency: str,
                          city_url_name: str) -> pd.DataFrame:
-        soup = self.__get_page(currency, city_url_name)
+        soup = self._get_page(currency, city_url_name)
         with open("test.html", "w", encoding="utf-8") as out:
             out.writelines(str(soup))
         popup = soup.select('div[class="notice-popup"]')
