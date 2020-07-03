@@ -6,10 +6,12 @@
 * pandas
 * selenium
 * beautifulsoup4
+* logging
+* unittests
 
 Использование:
 python CurrenciesPricesBot.py
 
 Тестирование:
-метод run_tests() у классов MessageParser и CurrenciesPricesParser
+python tests.py
 
