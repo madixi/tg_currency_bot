@@ -1,3 +1,4 @@
+import logging
 import re
 
 import telebot
@@ -10,9 +11,9 @@ MAX_PRICE_LEN = 6
 START_LINE_PATTERN = "```\n╔" + "═" * MAX_BANK_NAME_LEN + "╤" + "═" * 6 + "╗\n"
 END_LINE_PATTERN = "╚" + "═" * MAX_BANK_NAME_LEN + "╧" + "═" * MAX_PRICE_LEN \
                    + "╝\n```"
-START_MESSAGE = "🤖 Бот автоматически разбирает сообщения и отвечает, если появлялась валюта и город.\n"\
-                "☑ Разрешенные валюты 💸: USD, EUR, GBP, CNY, JPY (код или слово)\n"\
-                "🇷🇺 На данный момент поддерживаются административные центры всех 85 регинов\n"\
+START_MESSAGE = "🤖 Бот автоматически разбирает сообщения и отвечает, если появлялась валюта и город.\n" \
+                "☑ Разрешенные валюты 💸: USD, EUR, GBP, CNY, JPY (код или слово)\n" \
+                "🇷🇺 На данный момент поддерживаются административные центры всех 85 регинов\n" \
                 "☑ Также можно узнать курс ЦБ РФ по валюте в опрделенный день (/cb)"
 
 
@@ -33,16 +34,18 @@ with open("API_Token", "r") as inp:
 bot = telebot.TeleBot(API_Token)
 currency_parser = CurrenciesPricesParser()
 message_parser = MessageParser()
-
+logging.basicConfig(filename='bot.log', filemode='w', level='INFO')
 
 @bot.message_handler(commands=['start'])
 def handle_start_help(message):
     bot.send_message(message.chat.id, "Бот с курсами валют 💵💶💷💴")
     bot.send_message(message.chat.id, START_MESSAGE)
+    logging.info(f"Bot added to chat {message.chat.id}")
 
 
 @bot.message_handler(commands=['cb'])
 def handle_cb(message):
+    logging.info(f"Bot received /cb command: {message.text}")
     if re.match(r"^/cb [A-Za-z]{3} [0-9]{2}[./][0-9]{2}[./][0-9]{4}$",
                 message.text) is None:
         bot.send_message(message.chat.id, "Использование команды:\n"
@@ -61,6 +64,7 @@ def handle_cb(message):
 
 @bot.message_handler()
 def handle_any_message(message):
+    logging.info(f"Bot received message: {message.text}")
     message_parser.parse(message)
     parsed_data = message_parser.get_values()
     if len(parsed_data) == 3:
@@ -72,7 +76,7 @@ def handle_any_message(message):
             .get_local_prices(currency, city_url)
         if currency_rates is None:
             bot.edit_message_text(
-                f"Данных по {currency.upper()}в г. {city} нет",
+                f"Данных по {currency.upper()} в г. {city} нет",
                 chat_id=message.chat.id,
                 message_id=bot_message.message_id)
         else:
